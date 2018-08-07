@@ -45,6 +45,15 @@ class EventForm extends Component {
 }
 
 class App extends Component {
+  handleNewEventData = (prev, { subscribeToEvents }) => {
+    const newEventsList = prev.listEvents.items.concat([subscribeToEvents]);
+    return {listEvents: {items: newEventsList}};
+    
+    // Or...
+    // prev.listEvents.items.push(subscribeToEvents);
+    // return prev;
+  }
+
   render() {
     const ListView = ({ events }) => (
       <div>
@@ -64,11 +73,23 @@ class App extends Component {
       }
   }`;
 
+  const SubscribeToEvents = `subscription SubscribeToEvents {
+    subscribeToEvents {
+      id
+      name
+    }
+  }`;
+
+
   return (
       <div>
         <EventForm />
 
-        <Connect query={graphqlOperation(ListEvents)}>
+        <Connect 
+          query={graphqlOperation(ListEvents)}
+          subscription={graphqlOperation(SubscribeToEvents)}
+          onSubscriptionMsg={this.handleNewEventData}
+         >
             {
               ({ data, loading, errors }) => {
                 if (loading) return <div>Loading...</div>;
